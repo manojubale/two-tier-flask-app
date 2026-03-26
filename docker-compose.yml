@@ -1,43 +1,35 @@
 version: "3.8"
 
 services:
+  db:
+    image: mysql:8.0
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
   flask-app:
     build: .
     container_name: flask-app
     ports:
       - "5000:5000"
     environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=root
-      - MYSQL_DB=test_db
+      MYSQL_HOST: db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DB: test_db
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     command: >
       sh -c "
       echo 'Waiting for MySQL...' &&
-      sleep 10 &&
+      sleep 15 &&
       python app.py
       "
-    restart: always
-    networks:
-      - app-network
-
-  db:
-    image: mysql:8.0
-    container_name: mysql-db
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=test_db
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: always
     networks:
       - app-network
 
