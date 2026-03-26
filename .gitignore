@@ -1,0 +1,8 @@
+# Ignore MySQL data
+mysql-data/
+
+# General ignores
+.env
+__pycache__/
+*.pyc
+*.db
